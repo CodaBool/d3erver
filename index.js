@@ -43,9 +43,10 @@ router.get('/', async (request, env) => {
 router.post('/', async (request, env)=> {
 	const body = await request.json()
 	const url = new URL(request.url)
+	const allowedDomains = ["https://foundryvtt.com/", "https://api.foundryvtt.com/"]
 
 	// TODO: use a WAF as well
-	if (url !== "https://foundryvtt.com/") {
+	if (!allowedDomains.some(allowed => url === allowed)) {
 		console.log("blocked", url, body, "if this was a mistake allow additional domains")
 		return new Response(`${url} is unauthorized`, { status: 403 })
 	}
