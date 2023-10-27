@@ -53,6 +53,17 @@ router.get('/', async (request, env) => {
 	})
 })
 
+router.get('/download', async (request, env) => {
+	const module = new URL(request.url).searchParams.get("module")
+	const zip = await env.R2.get(module)
+	return new Response(zip.body, {
+		headers: {
+			'Content-Type': 'application/zip',
+			'Content-Disposition': `attachment; filename="${module.slice(0, -7)}.zip"`,
+		},
+	})
+})
+
 // from foundryvtt.com server
 router.post('/', async (request, env)=> {
 	const body = await request.json()
