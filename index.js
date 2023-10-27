@@ -6,22 +6,35 @@ router.get('/', async (request, env) => {
 	const url = new URL(request.url)
 	const token = url.searchParams.get("token")
 	const module = url.searchParams.get("module")
+	const secret = url.searchParams.get("secret")
 
 	if (!token || !module) {
 		return new Response('missing token or module query', { status: 400 })
 	}
 
-	const tokenExists = await env.KV.get(token)
-
-	if (env.ENVIRONMENT === "dev") {
-		console.log("found valid token for", module)
+	// for testing
+	if (secret === env.FOUNDRY_SECRET) {
+		console.log("bypassing with dev key")
+		const zip = await env.R2.get(module)
+		if (zip === null) {
+			return new Response(`module ${module} does not exist`, { status: 404 })
+		}
+		console.log("downloaded zip with filename", module.slice(0, -7))
+		return new Response(zip.body, {
+			headers: {
+				'Content-Type': 'application/zip',
+				'Content-Disposition': `attachment; filename="${module.slice(0, -7)}.zip"`,
+			},
+		})
 	}
+
+	const tokenExists = await env.KV.get(token)
 
 	if (!tokenExists) {
 		return new Response('Expired token', { status: 403 })
 	}
 
-	const zip = await env.R2.get(`https://module.codabool.com/${module}`)
+	const zip = await env.R2.get(module)
 
 	if (zip === null) {
 		return new Response(`module ${module} does not exist`, { status: 404 })
@@ -32,9 +45,10 @@ router.get('/', async (request, env) => {
 	}
 
 	// Return the zip file
-	return new Response(res.body, {
+	return new Response(zip.body, {
 		headers: {
 			'Content-Type': 'application/zip',
+			'Content-Disposition': `attachment; filename="${module.slice(0, -7)}.zip"`,
 		},
 	})
 })
@@ -48,7 +62,11 @@ router.post('/', async (request, env)=> {
 	// TODO: use a WAF as well
 	if (!allowedDomains.some(allowed => url === allowed)) {
 		console.log("blocked", url, body, "if this was a mistake allow additional domains")
-		return new Response(`${url} is unauthorized`, { status: 403 })
+		if (body.api_key === env.FOUNDRY_SECRET) {
+			console.log("aborting block, match on API secret token from", url)
+		} else {
+			return new Response(`${url} is unauthorized`, { status: 403 })
+		}
 	}
 
 	let uuid = await crypto.randomUUID()

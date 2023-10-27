@@ -8,7 +8,7 @@
     "start": "wrangler dev"
   },
   "devDependencies": {
-    "itty-router": "^3.0.12",
-    "wrangler": "^3.0.0"
+    "itty-router": "^4.0.23",
+    "wrangler": "^3.15.0"
   }
 }
