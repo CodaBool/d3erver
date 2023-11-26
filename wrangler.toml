@@ -5,8 +5,9 @@ compatibility_date = "2023-10-25"
 # Variable bindings. These are arbitrary, plaintext strings (similar to environment variables)
 # Note: Use secrets to store sensitive data.
 # Docs: https://developers.cloudflare.com/workers/platform/environment-variables
+# Secrets can be generated with the CLI
+# e.g. wrangler secret put KEY
 [vars]
-# ENVIRONMENT = "dev"
 DOMAIN = "d3erver.codabool.workers.dev"
 
 # Bind a KV Namespace. Use KV as persistent storage for small key-value pairs.
@@ -20,3 +21,8 @@ id = "81ef062090584ece9c048283e16749f3"
 [[r2_buckets]]
 binding = "R2"
 bucket_name = "module"
+
+[[d1_databases]]
+binding = "D1"
+database_name = "module-downloads"
+database_id = "f14a4036-0555-48d8-b28a-c2f7eb32499a"
