@@ -89,7 +89,7 @@ router.get('/manifest', async (request, env) => {
 	const secret = url.searchParams.get("secret")
 
 	if (!secret || !module) {
-		return new Response('missing token or secret query', { status: 400 })
+		return new Response('missing module or secret query', { status: 400 })
 	}
 
 	if (secret !== env.FORGE_SECRET) {
@@ -109,7 +109,9 @@ router.get('/manifest', async (request, env) => {
 	// 	WHERE year_month = '${date}' and platform = '${platform}' AND module = '${module}';
 	// `).run()
 
-	return new Response(template, {
+	const data = JSON.stringify(template, null, 2)
+
+	return new Response(data, {
 		headers: {
 			'Content-Type': 'application/json',
 		}
