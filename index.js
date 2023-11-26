@@ -79,6 +79,44 @@ router.get('/forge', async (request, env) => {
 	})
 })
 
+/*         The Forge              */
+// custom module.json for private packages, since a download and manifest contain secrets
+// this cannot be public so it is dynamically created after validation
+
+router.get('/manifest', async (request, env) => {
+	const url = new URL(request.url)
+	const module = url.searchParams.get("module")
+	const secret = url.searchParams.get("secret")
+
+	if (!secret || !module) {
+		return new Response('missing token or secret query', { status: 400 })
+	}
+
+	if (secret !== env.FORGE_SECRET) {
+		return new Response("unauthorized", { status: 403 })
+	}
+	
+  // TODO: fetch from D1 instead
+	const raw = await fetch('https://raw.githubusercontent.com/CodaBool/terminal/main/module.json')
+  const template = await raw.json()
+
+  template.manifest = `https://d3erver.codabool.workers.dev/manifest?secret=${secret}&module=${module}`
+  template.download = `https://d3erver.codabool.workers.dev/forge?secret=${env.FORGE_SECRET}&module=terminal-v${template.version}`
+
+	// const { meta } = await env.D1.prepare(`
+	// 	UPDATE downloads
+	// 	SET total = total + 1
+	// 	WHERE year_month = '${date}' and platform = '${platform}' AND module = '${module}';
+	// `).run()
+
+	return new Response(template, {
+		headers: {
+			'Content-Type': 'application/json',
+		}
+	})
+})
+
+
 /*         Foundry Server         */
 // creates a token in KV and returns JSON with a timed download URL
 
