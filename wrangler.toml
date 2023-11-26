@@ -24,5 +24,5 @@ bucket_name = "module"
 
 [[d1_databases]]
 binding = "D1"
-database_name = "module-downloads"
-database_id = "f14a4036-0555-48d8-b28a-c2f7eb32499a"
+database_name = "foundry"
+database_id = "64163431-5f3e-4f6d-90e4-4a07d177374f"
