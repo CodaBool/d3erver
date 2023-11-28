@@ -95,23 +95,21 @@ router.get('/manifest', async (request, env) => {
 	if (secret !== env.FORGE_SECRET) {
 		return new Response("unauthorized", { status: 403 })
 	}
-	
-  // TODO: fetch from D1 instead
-	const raw = await fetch('https://raw.githubusercontent.com/CodaBool/terminal/main/module.json')
-  const template = await raw.json()
+
+	// D1 will have values updated from module Github Actions
+	const { data } = await env.D1.prepare("SELECT * FROM manifests").first()
+  const template = JSON.parse(data)
+
+	// TODO: use github as a fallback for D1
+	// const raw = await fetch('https://raw.githubusercontent.com/CodaBool/terminal/main/module.json')
+  // const template = await raw.json()
 
   template.manifest = `https://d3erver.codabool.workers.dev/manifest?secret=${secret}&module=${module}`
   template.download = `https://d3erver.codabool.workers.dev/forge?secret=${env.FORGE_SECRET}&module=terminal-v${template.version}`
 
-	// const { meta } = await env.D1.prepare(`
-	// 	UPDATE downloads
-	// 	SET total = total + 1
-	// 	WHERE year_month = '${date}' and platform = '${platform}' AND module = '${module}';
-	// `).run()
+	const secretJSON = JSON.stringify(template, null, 2)
 
-	const data = JSON.stringify(template, null, 2)
-
-	return new Response(data, {
+	return new Response(secretJSON, {
 		headers: {
 			'Content-Type': 'application/json',
 		}
