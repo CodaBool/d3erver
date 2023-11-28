@@ -30,7 +30,7 @@ router.get('/', async (request, env) => {
 		return new Response('Error fetching the zip file', { status: 500 })
 	}
 
-	await increment("foundry", name)
+	await increment(env, "foundry", name)
 
 	// Return the zip file
 	return new Response(zip.body, {
@@ -69,7 +69,7 @@ router.get('/forge', async (request, env) => {
 		return new Response('Error fetching the zip file', { status: 500 })
 	}
 
-	await increment("forge", name)
+	await increment(env, "forge", name)
 
 	return new Response(zip.body, {
 		headers: {
@@ -156,7 +156,7 @@ router.post('/', async (request, env)=> {
 router.all('*', () => new Response('Not Found.', { status: 404 }))
 
 // increment CloudFlare D1, SQLite for record keeping
-async function increment(platform, module) {
+async function increment(env, platform, module) {
 	try {
 		let date = new Date()
 		date = date.getFullYear() + "-" + (date.getMonth() + 1)
