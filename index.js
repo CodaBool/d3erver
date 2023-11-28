@@ -161,17 +161,10 @@ async function increment(env, platform, module) {
 		let date = new Date()
 		date = date.getFullYear() + "-" + (date.getMonth() + 1)
 		
-		const { meta } = await env.D1.prepare(`
-			UPDATE downloads
-			SET total = total + 1
-			WHERE year_month = '${date}' and platform = '${platform}' AND module = '${module}';
-		`).run()
+		const { meta } = await env.D1.prepare(`UPDATE downloads SET total = total + 1 WHERE year_month = '${date}' and platform = '${platform}' AND module = '${module}'`).run()
 
 		if (!meta.changes) {
-			await env.D1.prepare(`
-				INSERT OR IGNORE INTO downloads (platform, module, total, year_month) 
-				VALUES ('${platform}', '${module}', 1, '${date}')
-			`).run()
+			await env.D1.prepare(`INSERT OR IGNORE INTO downloads (platform, module, total, year_month) VALUES ('${platform}', '${module}', 1, '${date}')`).run()
 		}
 	} catch (err) {
 		console.error(err)
