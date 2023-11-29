@@ -28,13 +28,13 @@ router.get('/', async (request, env) => {
 
 	if (zip === null) {
 		console.error("Foundry client asked for module", module, "which does not exist")
-		await email("d3erver 404 on GET / (Foundry clients)", `module ${module} does not exist`, "Error")
+		await email("d3erver 404 on GET / (Foundry clients)", `module ${module} does not exist`, "ERROR")
 		return new Response(`module ${module} does not exist`, { status: 404 })
 	}
 
 	if (zip.status >= 400) {
 		console.error(zip)
-		await email("d3erver 500 on GET / (Foundry clients)", `couldn't get module ${module} from R2 ${zip}`, "Error")
+		await email("d3erver 500 on GET / (Foundry clients)", `couldn't get module ${module} from R2 ${zip}`, "ERROR")
 		return new Response('Error fetching the zip file', { status: 500 })
 	}
 
@@ -76,13 +76,13 @@ router.get('/forge', async (request, env) => {
 
 	if (zip === null) {
 		console.error("Forge server asked for module", module, "which does not exist")
-		await email("d3erver 404 on GET /forge (Forge server)", `module ${module} does not exist`, "Error")
+		await email("d3erver 404 on GET /forge (Forge server)", `module ${module} does not exist`, "ERROR")
 		return new Response(`module ${module} does not exist`, { status: 404 })
 	}
 
 	if (zip.status >= 400) {
 		console.error(zip)
-		await email("d3erver 500 on GET /forge (Forge server)", `couldn't get module ${module} from R2 ${zip}`, "Error")
+		await email("d3erver 500 on GET /forge (Forge server)", `couldn't get module ${module} from R2 ${zip}`, "ERROR")
 		return new Response('Error fetching the zip file', { status: 500 })
 	}
 
@@ -189,7 +189,7 @@ async function increment(env, platform, module) {
 		}
 	} catch (err) {
 		console.error(err)
-		await email("increment", err, "Error")
+		await email("increment error", err, "ERROR")
 	}
 }
 
@@ -199,7 +199,7 @@ async function email(subject, value, name) {
 		headers: { "content-type": "application/json" },
 		body: JSON.stringify({
 			personalizations: [{
-				to: [{ email: env.EMAIL, name: "CodaBool" }],
+				to: [{ email: "codabool@pm.me", name: "CodaBool" }],
 			}],
 			from: {email: "d3erver@codabool.com", name },
 			content: [{ type: 'text/plain', value }],
