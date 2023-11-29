@@ -10,7 +10,7 @@ router.get('/', async (request, env) => {
 	const module = url.searchParams.get("module")
 
 	if (!token || !module) {
-		console.log("url missing a query, could be a bot", url, request)
+		console.log("url missing a query, could be a bot", url, JSON.stringify(request, null, 2))
 		await email("d3erver 400 on GET / (Foundry clients)", `url missing a query ${url}`, "DEBUG")
 		return new Response('missing token or module query', { status: 400 })
 	}
@@ -19,7 +19,7 @@ router.get('/', async (request, env) => {
 	const tokenExists = await env.KV.get(token)
 
 	if (!tokenExists) {
-		console.log("unauthorized expired token", request)
+		console.log("unauthorized expired token", JSON.stringify(request, null, 2))
 		await email("d3erver 403 on GET / (Foundry clients)", `Expired Token\n${JSON.stringify(request,null,2)}`, "DEBUG")
 		return new Response('Expired token', { status: 403 })
 	}
@@ -58,16 +58,16 @@ router.get('/forge', async (request, env) => {
 	const module = url.searchParams.get("module")
 	const secret = url.searchParams.get("secret")
 
-	console.log("DEBUG: /forge server", request)
+	console.log("DEBUG: /forge server", JSON.stringify(request, null, 2))
 
 	if (!secret || !module) {
-		console.log("unauthorized, could be a bot", url, request, secret, module)
-		await email("d3erver 400 on GET /forge (Forge server)", `url missing a query ${url}`, "DEBUG")
-		return new Response('missing token or secret query', { status: 400 })
+		console.log("unauthorized, could be a bot", url, JSON.stringify(request, null, 2), secret, module)
+		await email("d3erver 400 on GET /forge (Forge server)", `url missing a query ${url} req ${JSON.stringify(request, null, 2)}`, "DEBUG")
+		return new Response('missing module or unauthorized', { status: 400 })
 	}
 
 	if (secret !== env.FORGE_SECRET) {
-		console.error("unauthorized", secret, request)
+		console.error("unauthorized", secret, JSON.stringify(request, null, 2))
 		await email("d3erver 403 on GET /forge (Forge server)", `wrong secret ${secret} from ${JSON.stringify(request, null, 2)}`, "ERROR")
 		return new Response("unauthorized", { status: 403 })
 	}
@@ -107,13 +107,13 @@ router.get('/manifest', async (request, env) => {
 	const secret = url.searchParams.get("secret")
 
 	if (!secret || !moduleName) {
-		console.log("url missing a query, could be a bot", url, request)
-		await email("d3erver 400 on GET /manifest (Forge server)", `url missing a query ${url}`, "DEBUG")
+		console.log("url missing a query, could be a bot", url, JSON.stringify(request, null, 2))
+		await email("d3erver 400 on GET /manifest (Forge server)", `url missing a query ${url} req ${JSON.stringify(request, null, 2)}`, "DEBUG")
 		return new Response('missing module or secret query', { status: 400 })
 	}
 
 	if (secret !== env.FORGE_SECRET) {
-		console.error("unauthorized", secret, request)
+		console.error("unauthorized", secret, JSON.stringify(request, null, 2))
 		await email("d3erver 403 on GET /manifest (Forge server)", `wrong secret ${secret} from ${JSON.stringify(request, null, 2)}`, "ERROR")
 		return new Response("unauthorized", { status: 403 })
 	}
@@ -143,17 +143,17 @@ router.post('/', async (request, env)=> {
 	const url = new URL(request.url)
 	const allowedDomains = ["https://foundryvtt.com/", "https://api.foundryvtt.com/"]
 
-	console.log("DEBUG: req from URL", url)
+	console.log("DEBUG: /post req", JSON.stringify(request, null, 2))
 
 	if (!allowedDomains.some(allowed => url === allowed)) {
-		console.log("blocked", url, body, "if this was a mistake allow additional domains")
+		console.log("initial block with body", body, "if this was a mistake allow additional domains", JSON.stringify(request, null, 2))
 		if (body?.api_key !== env.FOUNDRY_SECRET) {
-			console.log("unauthorized, could be a bot", url, request, body?.api_key)
-			await email("d3erver 403 on POST / (Foundry server)", `(could be bot)\nnot on allowed domain with ${url}\nand api_key did not match, found ${body?.api_key}`, "WARN")
-			return new Response(`${url} is unauthorized`, { status: 403 })
+			console.log("unauthorized, could be a bot", JSON.stringify(request, null, 2), body?.api_key)
+			await email("d3erver 403 on POST / (Foundry server)", `(could be bot)\nnot on allowed domain with ${JSON.stringify(request, null, 2)}\nand api_key did not match, found ${body?.api_key}`, "WARN")
+			return new Response("unauthorized", { status: 403 })
 		}
-		await email("d3erver misconfigured allowlist on POST / (Foundry server)", `req from ${url} but passed api key. Add this domain to allowlist.`, "WARN")
-		console.log("aborting block, match on API secret. Add new Foundry domain of", url, "to allowlist!")
+		await email("d3erver misconfigured allowlist on POST / (Foundry server)", `req from ${JSON.stringify(request, null, 2)} but passed api key. Add this domain to allowlist.`, "WARN")
+		console.log("aborting block, match on API secret. Add new Foundry domain of", JSON.stringify(request, null, 2), "to allowlist!")
 	}
 
 	// 4h timed token
