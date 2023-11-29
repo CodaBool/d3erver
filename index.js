@@ -34,7 +34,7 @@ router.get('/', async (request, env) => {
 
 	if (zip.status >= 400) {
 		console.error(zip)
-		await email("d3erver 500 on GET / (Foundry clients)", `couldn't get module ${module} from R2 ${zip}`, "ERROR")
+		await email("d3erver 500 on GET / (Foundry clients)", `couldn't get module ${module} from R2 ${JSON.stringify(zip, null, 2)}`, "ERROR")
 		return new Response('Error fetching the zip file', { status: 500 })
 	}
 
@@ -82,7 +82,7 @@ router.get('/forge', async (request, env) => {
 
 	if (zip.status >= 400) {
 		console.error(zip)
-		await email("d3erver 500 on GET /forge (Forge server)", `couldn't get module ${module} from R2 ${zip}`, "ERROR")
+		await email("d3erver 500 on GET /forge (Forge server)", `couldn't get module ${module} from R2 ${JSON.stringify(zip, null, 2)}`, "ERROR")
 		return new Response('Error fetching the zip file', { status: 500 })
 	}
 
@@ -114,7 +114,7 @@ router.get('/manifest', async (request, env) => {
 
 	if (secret !== env.FORGE_SECRET) {
 		console.error("unauthorized", secret, request)
-		await email("d3erver 403 on GET /manifest (Forge server)", `wrong secret ${secret} from ${request}`, "ERROR")
+		await email("d3erver 403 on GET /manifest (Forge server)", `wrong secret ${secret} from ${JSON.stringify(request, null, 2)}`, "ERROR")
 		return new Response("unauthorized", { status: 403 })
 	}
 
@@ -189,7 +189,7 @@ async function increment(env, platform, module) {
 		}
 	} catch (err) {
 		console.error(err)
-		await email("increment error", err, "ERROR")
+		await email("increment error", JSON.stringify(err, null, 2), "ERROR")
 	}
 }
 
