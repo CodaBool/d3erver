@@ -9,6 +9,7 @@ compatibility_date = "2023-10-25"
 # e.g. wrangler secret put KEY
 [vars]
 DOMAIN = "d3erver.codabool.workers.dev"
+EMAIL = "codabool@pm.me"
 
 # Bind a KV Namespace. Use KV as persistent storage for small key-value pairs.
 # Docs: https://developers.cloudflare.com/workers/runtime-apis/kv
