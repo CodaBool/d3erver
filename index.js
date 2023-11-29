@@ -9,6 +9,8 @@ router.get('/', async (request, env) => {
 	const token = url.searchParams.get("token")
 	const module = url.searchParams.get("module")
 
+	console.log("req url", request.url)
+
 	if (!token || !module) {
 		const country = request.headers.get('cf-ipcountry')
 		const agent = request.headers.get('user-agent')
