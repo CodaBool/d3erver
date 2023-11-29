@@ -11,7 +11,8 @@ router.get('/', async (request, env) => {
 
 	if (!token || !module) {
 		console.log("url missing a query, could be a bot", url, JSON.stringify(request, null, 2))
-		await email("d3erver 400 on GET / (Foundry clients)", `url missing a query ${url}`, "DEBUG")
+		await email("d3erver 400 on GET / (Foundry clients)", `url missing a query ${url} req ${JSON.stringify(request, null, 2)}`, "DEBUG")
+		console.log("headers", new Map(request?.headers))
 		return new Response('missing token or module query', { status: 400 })
 	}
 

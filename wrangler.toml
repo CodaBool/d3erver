@@ -1,6 +1,7 @@
 name = "d3erver"
 main = "index.js"
 compatibility_date = "2023-10-25"
+logpush = true
 
 # Variable bindings. These are arbitrary, plaintext strings (similar to environment variables)
 # Note: Use secrets to store sensitive data.
