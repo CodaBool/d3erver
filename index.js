@@ -10,9 +10,11 @@ router.get('/', async (request, env) => {
 	const module = url.searchParams.get("module")
 
 	if (!token || !module) {
-		console.log("url missing a query, could be a bot", url, JSON.stringify(request, null, 2))
-		await email("d3erver 400 on GET / (Foundry clients)", `url missing a query ${url} req ${JSON.stringify(request, null, 2)}`, "DEBUG")
-		console.log("headers", JSON.stringify(Array.from(new Map(request?.headers)), null,2))
+		const country = request.headers.get('cf-ipcountry')
+		const agent = request.headers.get('user-agent')
+		const ip = request.headers.get('x-real-ip')
+		console.log(`url missing query, likely a bot. country=${country} agent=${agent} ip=${ip}`)
+		await email("d3erver 400 on GET / (Foundry clients)", `url missing query, likely a bot. country=${country} agent=${agent} ip=${ip}`, "DEBUG")
 		return new Response('missing token or module query', { status: 400 })
 	}
 
@@ -59,7 +61,11 @@ router.get('/forge', async (request, env) => {
 	const module = url.searchParams.get("module")
 	const secret = url.searchParams.get("secret")
 
-	console.log("DEBUG: /forge server", JSON.stringify(request, null, 2))
+	// debug
+	const country = request.headers.get('cf-ipcountry')
+	const agent = request.headers.get('user-agent')
+	const ip = request.headers.get('x-real-ip')
+	console.log(`country=${country} agent=${agent} ip=${ip}`)
 
 	if (!secret || !module) {
 		console.log("unauthorized, could be a bot", url, JSON.stringify(request, null, 2), secret, module)
@@ -107,7 +113,27 @@ router.get('/manifest', async (request, env) => {
 	const moduleName = url.searchParams.get("module")
 	const secret = url.searchParams.get("secret")
 
+	// debug
+	const country = request.headers.get('cf-ipcountry')
+	const agent = request.headers.get('user-agent')
+	const ip = request.headers.get('x-real-ip')
+	console.log(`country=${country} agent=${agent} ip=${ip}`)
+
+	if (agent === "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)") {
+		console.log('validated on agent')
+	}
+	if (ip === "15.235.53.129") {
+		console.log('validated on ip')
+	}
+	if (country === "CA") {
+		console.log('validated on country')
+	}
+	// tends to be === "15.235.53.129"
+	// tends to be === node-fetch/1.0 (+https://github.com/bitinn/node-fetch)
+
+
 	if (!secret || !moduleName) {
+
 		console.log("url missing a query, could be a bot", url, JSON.stringify(request, null, 2))
 		await email("d3erver 400 on GET /manifest (Forge server)", `url missing a query ${url} req ${JSON.stringify(request, null, 2)}`, "DEBUG")
 		return new Response('missing module or secret query', { status: 400 })
