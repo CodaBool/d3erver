@@ -68,7 +68,7 @@ router.get('/forge', async (request, env) => {
 
 	if (secret !== env.FORGE_SECRET) {
 		console.error("unauthorized", secret, request)
-		await email("d3erver 403 on GET /forge (Forge server)", `wrong secret ${secret} from ${request}`, "ERROR")
+		await email("d3erver 403 on GET /forge (Forge server)", `wrong secret ${secret} from ${JSON.stringify(request, null, 2)}`, "ERROR")
 		return new Response("unauthorized", { status: 403 })
 	}
 
