@@ -244,7 +244,7 @@ async function email(subject, value, name) {
 		console.error(`Error sending email: ${mail.status} ${mail.statusText} ${text}`)
 		return
 	}
-	console.log(mail.statusText)
+	console.log("email =", mail.statusText)
 }
 
 export default {
