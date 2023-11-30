@@ -14,7 +14,7 @@ router.get('/', async (request, env) => {
 
 	if (!token || !module) {
 		// ============ DEBUG
-		console.log(`url missing a query, likely a bot. ip=${ip} agent=${agent} country=${country} token=${token} module=${module}`)
+		// console.log(`url missing a query, likely a bot. ip=${ip} agent=${agent} country=${country} token=${token} module=${module}`)
 		return new Response('missing a query', { status: 400 })
 	}
 
